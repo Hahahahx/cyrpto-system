@@ -3,6 +3,7 @@ package context
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,7 +15,7 @@ type Logger struct {
 }
 
 func LoadLogger() error {
-	file := App.Config.Path.Config + time.Now().Format("2006") + "_log" + ".txt"
+	file := filepath.Join(App.Config.Path.Config, time.Now().Format("2006")+"_log.txt")
 	logFile, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
 	if err != nil {
 		return err

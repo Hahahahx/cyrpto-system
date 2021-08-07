@@ -2,7 +2,7 @@ package commands
 
 import (
 	"crypto-system/internal/context"
-	"crypto-system/internal/crypto"
+	"fmt"
 	"github.com/urfave/cli/v2" // imports as package "cli"
 	"log"
 	"os"
@@ -16,14 +16,10 @@ func Init() *cli.Command {
 		Usage: "initialize crypto-system configure file",
 		Action: func(c *cli.Context) error {
 
-			// 查看全部环境变量
-			// environ := os.Environ()
-			// for i := range environ {
-			// 	fmt.Println(environ[i])
-			// }
 			path := c.String("p")
 			if path == "" {
-				path = os.Getenv("HOMEPATH")
+				abs, _ := filepath.Abs(".")
+				path = abs
 			}
 			if AddConfigPathAndSetEnv(path) != nil {
 
@@ -36,7 +32,7 @@ func Init() *cli.Command {
 				return nil
 			}
 
-			_, err := crypto.GenerateKey()
+			_, err := context.GenerateKey()
 			if err != nil {
 				log.Fatalln("load crypto is error")
 				return nil
@@ -65,5 +61,8 @@ func AddConfigPathAndSetEnv(path string) error {
 	if err := os.MkdirAll(path, 0777); err != nil {
 		return err
 	}
+
+	fmt.Println("init to path ", path)
+
 	return os.Setenv("CRYPT_SYSTEM_CONFIG_PATH", path)
 }

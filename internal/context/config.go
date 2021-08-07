@@ -29,21 +29,32 @@ func GenerateConfig() error {
 	viper.SetDefault("server.host", "192.168.50.219")
 	viper.SetDefault("server.port", 9090)
 	viper.SetDefault("path.config", configPath)
-	viper.SetDefault("path.download", "./")
+	abs, _ := filepath.Abs(".")
+	viper.SetDefault("path.download", abs)
 	viper.SetDefault("log", "info")
-	return viper.WriteConfigAs("config.yaml")
+	return viper.WriteConfigAs(filepath.Join(configPath, "config.yaml"))
 }
 
 func LoadConfig() error {
+	// 查看全部环境变量
+	// environ := os.Environ()
+	// for i := range environ {
+	// 	fmt.Println(environ[i])
+	// }
 	configPath := os.Getenv("CRYPT_SYSTEM_CONFIG_PATH")
+	if configPath == "" {
+		configPath = ".crypto-system/"
+	}
 	viper.SetConfigType("yaml")
-	viper.SetConfigFile(filepath.Join(configPath, "config.yml"))
+	viper.SetConfigFile(filepath.Join(configPath, "config.yaml"))
 
-	err := viper.ReadInConfig()
-	if err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
 
-	return viper.Unmarshal(App.Config)
+	if err := viper.Unmarshal(&App.Config); err != nil {
+		return err
+	}
 
+	return nil
 }

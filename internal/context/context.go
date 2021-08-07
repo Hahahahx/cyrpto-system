@@ -8,15 +8,18 @@ import (
 )
 
 type Context struct {
-	Cli    *cli.App
+	Cli    cli.App
 	Crypto *crypto.Crypto
-	Config *Config
-	Logger *Logger
+	Config Config
+	Logger Logger
 }
 
 var App *Context
 
 func Load() {
+
+	App = &Context{}
+
 	if LoadConfig() != nil {
 		log.Fatalln("load configure file is error, maybe you sould to execute init first")
 		return
