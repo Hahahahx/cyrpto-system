@@ -1,8 +1,9 @@
 package commands
 
 import (
+	"crypto-system/action"
 	"crypto-system/internal/context"
-	"fmt"
+	"errors"
 	"github.com/urfave/cli/v2" // imports as package "cli"
 )
 
@@ -13,17 +14,21 @@ func Add() *cli.Command {
 		Usage: "add a task to the list",
 		Action: func(c *cli.Context) error {
 			context.Load()
-			filename := c.Args().First()
-			if c.Bool("e") {
-				fmt.Println("added task: ", filename)
-			} else {
-				fmt.Println("added task: ", filename)
+
+			if c.Args().First() == "" {
+				context.App.Logger.Error(errors.New("error Args"))
 			}
+
+			action.Add(&context.Request{
+				App: context.App,
+				Cli: c,
+			})
+
 			return nil
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:    "encryt",
+				Name:    "encrypt",
 				Value:   false,
 				Aliases: []string{"e"},
 				Usage:   "encrypt upload `bool`",

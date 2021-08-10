@@ -5,6 +5,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 func main() {
@@ -15,6 +17,17 @@ func main() {
 	fmt.Println("密文：", encryptCode)
 	decryptCode := AESDecrypt(encryptCode, key)
 	fmt.Println("解密结果：", decryptCode)
+}
+
+func GetRandomString(l int) string {
+	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ=-+;"
+	bytes := []byte(str)
+	result := []byte{}
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < l; i++ {
+		result = append(result, bytes[r.Intn(len(bytes))])
+	}
+	return string(result)
 }
 
 func AESEncrypt(orig []byte, key string) []byte {

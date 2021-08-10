@@ -26,6 +26,9 @@ func init() {
 		Commands: []*cli.Command{
 
 			commands.Add(),
+			commands.Get(),
+			commands.Encrypt(),
+			commands.Decrypt(),
 			commands.Init(),
 		},
 	}

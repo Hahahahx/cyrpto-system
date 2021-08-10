@@ -81,7 +81,7 @@ func GenerateRSAKey(path string) (*Crypto, error) {
 }
 
 // 加密
-func RSAEncrypt(origData, publicKey []byte) (string, error) {
+func RSAEncrypt(origData string, publicKey []byte) (string, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
 		return "", errors.New("public key error")
@@ -92,7 +92,7 @@ func RSAEncrypt(origData, publicKey []byte) (string, error) {
 	}
 	pub := pubInterface.(*rsa.PublicKey)
 
-	res, err := rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
+	res, err := rsa.EncryptPKCS1v15(rand.Reader, pub, []byte(origData))
 	if err != nil {
 		return "", err
 	}
@@ -101,17 +101,17 @@ func RSAEncrypt(origData, publicKey []byte) (string, error) {
 }
 
 // 解密
-func RSADecrypt(ciphertext string, privateKey []byte) ([]byte, error) {
+func RSADecrypt(ciphertext string, privateKey []byte) (string, error) {
 
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
 		fmt.Println("block error")
-		return nil, errors.New("private key error!")
+		return "", errors.New("private key error!")
 	}
 	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		fmt.Println("priv error")
-		return nil, err
+		return "", err
 	}
 
 	decodeBytes, _ := base64.StdEncoding.DecodeString(ciphertext)
@@ -124,7 +124,7 @@ func RSADecrypt(ciphertext string, privateKey []byte) ([]byte, error) {
 	if err != nil {
 
 		fmt.Println("DecryptPKCS1v15 error")
-		return nil, err
+		return "", err
 	}
-	return res, nil
+	return string(res), nil
 }

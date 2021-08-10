@@ -11,27 +11,59 @@ type Config struct {
 	Server *Server `yaml:"server"`
 	Path   *Path   `yaml:"path"`
 	Log    string  `yaml:"log"`
+	Ipfs   *Ipfs   `yaml:"ipfs"`
+}
+
+type Ipfs struct {
+	Host string `yaml:"host"`
 }
 
 type Server struct {
 	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Port string `yaml:"port"`
 }
 
 type Path struct {
-	Config   string `yaml:"config"`
-	Download string `yaml:"download"`
+	Config string `yaml:"config"`
+}
+
+func (p *Path) Download() string {
+	return filepath.Join(p.Config, "files")
+}
+
+func (p *Path) Log() string {
+	return filepath.Join(p.Config, "logs")
+}
+func (p *Path) Cache() string {
+	return filepath.Join(p.Config, "caches")
+}
+
+func (s *Server) URL(route string) string {
+	return s.Host + ":" + s.Port + "/" + route
+}
+
+func (i *Ipfs) Api() string {
+	return i.Host + ":5001"
+}
+
+func (i *Ipfs) Gateway() string {
+	return i.Host + ":8080"
+}
+
+func (i *Ipfs) GetFileURL(cid string) string {
+	return i.Host + ":8080/ipfs/" + cid
 }
 
 func GenerateConfig() error {
 	configPath := os.Getenv("CRYPT_SYSTEM_CONFIG_PATH")
 	viper.AddConfigPath(configPath)
-	viper.SetDefault("server.host", "192.168.50.219")
+	viper.SetDefault("server.host", "http://192.168.50.219")
 	viper.SetDefault("server.port", 9090)
 	viper.SetDefault("path.config", configPath)
-	abs, _ := filepath.Abs(".")
-	viper.SetDefault("path.download", abs)
 	viper.SetDefault("log", "info")
+	viper.SetDefault("ipfs.host", "http://192.168.50.219")
+	// viper.SetDefault("ipfs.api", 5001)
+	// viper.SetDefault("ipfs.gateway", 8080)
 	return viper.WriteConfigAs(filepath.Join(configPath, "config.yaml"))
 }
 

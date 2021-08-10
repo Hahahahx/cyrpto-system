@@ -1,7 +1,8 @@
+ipfs:
+  host: http://192.168.50.219
 log: info
 path:
   config: E:\workspace\go\ipfs-crypto\.crypto-system
-  download: E:\workspace\go\ipfs-crypto
 server:
-  host: 192.168.50.219
+  host: http://192.168.50.219
   port: 9090

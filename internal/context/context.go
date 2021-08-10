@@ -4,14 +4,21 @@ import (
 	"crypto-system/internal/crypto"
 	"log"
 
+	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/urfave/cli/v2" // imports as package "cli"
 )
+
+type Request struct {
+	App *Context
+	Cli *cli.Context
+}
 
 type Context struct {
 	Cli    cli.App
 	Crypto *crypto.Crypto
 	Config Config
 	Logger Logger
+	Ipfs   *shell.Shell
 }
 
 var App *Context
@@ -36,5 +43,15 @@ func Load() {
 	}
 
 	App.Crypto = crypto
+	App.Ipfs = shell.NewShell(App.Config.Ipfs.Api())
+
+	res, err := App.Ipfs.ID()
+
+	if err != nil {
+		log.Fatalln("connect ipfs is error")
+		return
+	}
+
+	App.Logger.Log("ipfs id : " + res.ID)
 
 }
