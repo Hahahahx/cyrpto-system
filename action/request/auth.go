@@ -10,7 +10,7 @@ import (
 	"crypto-system/internal/context"
 )
 
-func VerifyMD5(c *context.Request, md5 string) ResultMD5 {
+func VerifyMD5(c *context.Request, md5 string) map[string]interface{} {
 	params := url.Values{}
 	Url, err := url.Parse(c.App.Config.Server.URL("auth/verify"))
 
@@ -33,12 +33,7 @@ func VerifyMD5(c *context.Request, md5 string) ResultMD5 {
 		c.App.Logger.Error(errors.New("http request error"))
 	}
 
-	var data ResultMD5
-	_ = json.Unmarshal(body, &data)
-
-	data.Md5 = md5
-
-	return data
+	return res.Data
 }
 
 func GetKMSKey(c *context.Request) string {
@@ -58,7 +53,7 @@ func GetKMSKey(c *context.Request) string {
 		c.App.Logger.Error(errors.New("http request error"))
 	}
 
-	return res.Data["key"]
+	return res.Data["key"].(string)
 
 }
 
@@ -78,7 +73,7 @@ func DecryptFile(c *context.Request, cid string) string {
 	if !res.Result {
 		c.App.Logger.Error(errors.New("http request error"))
 	}
-	return res.Data["key"]
+	return res.Data["key"].(string)
 }
 
 func UploadFile(c *context.Request, md *MateData) bool {

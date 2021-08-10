@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"crypto-system/action/request"
 	"crypto-system/internal/context"
+	"fmt"
 	"os"
+	"time"
 )
 
 func Add(c *context.Request) {
 
+	start := time.Now() // 获取当前时间
 	filename := c.Cli.Args().First()
 
 	isEncrypt := c.Cli.Bool("e")
@@ -32,14 +35,14 @@ func Add(c *context.Request) {
 
 		file.Close()
 
-		res := verifyMD5(c, buf)
+		res, frigerPrint := verifyMD5(c, buf)
 
-		if res.HasFile {
-			c.App.Logger.Log("上传成功,CID: ", res.CID)
+		if res["hasFile"].(bool) {
+			c.App.Logger.Log("上传成功,CID: ", res["CID"])
 			return
 		}
 
-		md.MD5 = res.Md5
+		md.MD5 = frigerPrint
 
 		buf, key := encryptFile(c, buf)
 
@@ -57,6 +60,8 @@ func Add(c *context.Request) {
 		// todo：上传matedata数据
 		request.UploadFile(c, md)
 		c.App.Logger.Log("上传成功,CID: ", md.CID)
+		elapsed := time.Since(start)
+		fmt.Println("该命令执行完成耗时：", elapsed)
 		return
 
 	}
@@ -65,4 +70,6 @@ func Add(c *context.Request) {
 
 	c.App.Logger.Log("上传成功,CID: ", cid)
 
+	elapsed := time.Since(start)
+	fmt.Println("该命令执行完成耗时：", elapsed)
 }
