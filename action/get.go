@@ -3,12 +3,15 @@ package action
 import (
 	"crypto-system/internal/context"
 	"crypto-system/internal/crypto"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 func Get(c *context.Request) {
 
+	start := time.Now() // 获取当前时间
 	cid := c.Cli.Args().First()
 
 	url := c.App.Config.Ipfs.GetFileURL(cid)
@@ -27,10 +30,15 @@ func Get(c *context.Request) {
 
 		key := remoteDecryptKey(c, cid)
 
-		data = crypto.AESDecrypt(data, key)
+		ases := time.Now() // 获取当前时间
+		data = crypto.AesCTR_Decrypt(data, key)
+		elapsed := time.Since(ases)
+		fmt.Println("文件AES解密完成耗时：", elapsed)
 
 	}
 
 	download(c, data, c.Cli.String("n"))
+	elapsed := time.Since(start)
+	fmt.Println("该命令执行完成耗时：", elapsed)
 
 }

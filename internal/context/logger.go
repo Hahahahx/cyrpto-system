@@ -1,9 +1,13 @@
 package context
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,18 +19,13 @@ type Logger struct {
 }
 
 func LoadLogger() error {
-
-	if err := os.MkdirAll(App.Config.Path.Log(), 0777); err != nil {
-		return err
-	}
-
 	file := filepath.Join(App.Config.Path.Log(), "log_"+time.Now().Format("2006")+".txt")
 	logFile, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
 	if err != nil {
 		return err
 	}
-	App.Logger.Logger = log.New(logFile, "", log.LstdFlags|log.LUTC) // 将文件设置为loger作为输出
-
+	mw := io.MultiWriter(os.Stdout, logFile)
+	App.Logger.Logger = log.New(mw, "", log.LstdFlags|log.LUTC) // 将文件设置为loger作为输出
 	return nil
 }
 
@@ -44,37 +43,37 @@ func (l *Logger) Log(msg ...interface{}) {
 	}
 }
 
+func backGround(cBg color.Attribute, format string, a ...interface{}) string {
+	c := color.New(color.FgCyan).Add(cBg)
+	return c.Sprint(color.BlackString(format, a...))
+}
+
 func (l *Logger) Info(msg ...interface{}) {
-	// 背景色，但是字体颜色就没法修改了
-	// c:=color.New(color.FgCyan).Add(color.BgRed)
-	l.Logger.SetPrefix(color.BlueString("[Info]"))
+
+	l.Logger.SetPrefix(backGround(color.BgBlue, " INFO ") + "  ")
 	l.Logger.Println(msg...)
-	log.SetPrefix(color.BlueString("[Info]"))
-	log.Println(msg...)
 
 }
 
 func (l *Logger) Warn(msg ...interface{}) {
-	l.Logger.SetPrefix(color.YellowString("[WARN]"))
+	l.Logger.SetPrefix(backGround(color.BgYellow, " WARN ") + "  ")
 	l.Logger.Println(msg...)
-	log.SetPrefix(color.YellowString("[WARN]"))
-	log.Println(msg...)
 }
 
 func (l *Logger) Debug(msg ...interface{}) {
-	l.Logger.SetPrefix(color.GreenString("[DEBUG]"))
+	l.Logger.SetPrefix(backGround(color.BgGreen, " DEBUG ") + " ")
 	l.Logger.Println(msg...)
-	log.SetPrefix(color.GreenString("[DEBUG]"))
-	log.Println(msg...)
 }
 
 func (l *Logger) Error(err error, msg ...interface{}) {
 	if err != nil {
-		l.Logger.SetFlags(log.Llongfile)
-		l.Logger.SetPrefix(color.RedString("[ERROR]"))
-		l.Logger.Println(msg...)
-		log.SetFlags(log.Llongfile)
-		log.SetPrefix(color.RedString("[ERROR]"))
-		log.Fatalln(msg...)
+		l.Logger.SetPrefix(backGround(color.BgRed, " ERROR ") + " ")
+		if App.Config.Log == "debug" {
+			_, file, line, _ := runtime.Caller(1)
+			l.Logger.Println(file+":"+strconv.Itoa(line), err, fmt.Sprint(msg...))
+		} else {
+			l.Logger.Println(err, fmt.Sprint(msg...))
+		}
+		os.Exit(3)
 	}
 }

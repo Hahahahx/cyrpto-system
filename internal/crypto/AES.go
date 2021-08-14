@@ -13,9 +13,9 @@ func main() {
 	orig := "http://c.biancheng.net/golang/"
 	key := "123456781234567812345678"
 	fmt.Println("原文：", orig)
-	encryptCode := AESEncrypt([]byte(orig), key)
+	encryptCode := AesCBC_Encrypt([]byte(orig), key)
 	fmt.Println("密文：", encryptCode)
-	decryptCode := AESDecrypt(encryptCode, key)
+	decryptCode := AesCBC_Decrypt(encryptCode, key)
 	fmt.Println("解密结果：", decryptCode)
 }
 
@@ -30,7 +30,29 @@ func GetRandomString(l int) string {
 	return string(result)
 }
 
-func AESEncrypt(orig []byte, key string) []byte {
+func AesCTR_Encrypt(orig []byte, key string) []byte {
+	k := []byte("wumansgygoaescbc")
+
+	block, _ := aes.NewCipher(k)
+	stream := cipher.NewCTR(block, k)
+
+	cipherText := make([]byte, len(orig))
+	stream.XORKeyStream(cipherText, orig)
+	return cipherText
+}
+
+func AesCTR_Decrypt(cryted []byte, key string) []byte {
+	k := []byte("wumansgygoaescbc")
+
+	block, _ := aes.NewCipher(k)
+	stream := cipher.NewCTR(block, k)
+
+	plainText := make([]byte, len(cryted))
+	stream.XORKeyStream(plainText, cryted)
+	return plainText
+}
+
+func AesCBC_Encrypt(orig []byte, key string) []byte {
 	// 转成字节数组
 	k := []byte(key)
 	// 分组秘钥
@@ -48,7 +70,7 @@ func AESEncrypt(orig []byte, key string) []byte {
 	return cryted
 }
 
-func AESDecrypt(cryted []byte, key string) []byte {
+func AesCBC_Decrypt(cryted []byte, key string) []byte {
 	k := []byte(key)
 	// 分组秘钥
 	block, _ := aes.NewCipher(k)

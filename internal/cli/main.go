@@ -27,6 +27,7 @@ func init() {
 
 			commands.Add(),
 			commands.Get(),
+			commands.MD5(),
 			commands.Encrypt(),
 			commands.Decrypt(),
 			commands.Init(),

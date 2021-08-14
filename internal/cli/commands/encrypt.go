@@ -28,11 +28,9 @@ func Encrypt() *cli.Command {
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "name",
-				Required: true,
-				Value:    "<null>",
-				Aliases:  []string{"n"},
-				Usage:    "encrypt name <file.key> `string`",
+				Name:    "name",
+				Aliases: []string{"n"},
+				Usage:   "modify encrypt file name `string`",
 			},
 		},
 	}

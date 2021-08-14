@@ -1,7 +1,6 @@
 package action
 
 import (
-	"bytes"
 	"crypto-system/action/request"
 	"crypto-system/internal/context"
 	"fmt"
@@ -18,6 +17,7 @@ func Add(c *context.Request) {
 
 	file, err := os.Open(filename)
 	c.App.Logger.Error(err)
+	defer file.Close()
 
 	if isEncrypt {
 
@@ -29,13 +29,10 @@ func Add(c *context.Request) {
 			Size: fileInfo.Size(),
 		}
 
-		buf := make([]byte, fileInfo.Size())
+		// buf := make([]byte, fileInfo.Size())
+		// file.Read(buf)
 
-		file.Read(buf)
-
-		file.Close()
-
-		res, frigerPrint := verifyMD5(c, buf)
+		res, frigerPrint := verifyMD5(c, file)
 
 		if res["hasFile"].(bool) {
 			c.App.Logger.Log("上传成功,CID: ", res["CID"])
@@ -44,14 +41,15 @@ func Add(c *context.Request) {
 
 		md.MD5 = frigerPrint
 
-		buf, key := encryptFile(c, buf)
+		cache, key := encryptFileCache(c, file)
+		// buf, key := encryptFile(c, buf)
 
 		key = remoteEncryptKey(c, key)
 
 		md.Key = key
 
-		read := bytes.NewReader(buf)
-		cid, err := c.App.Ipfs.Add(read)
+		// read := bytes.NewReader(buf)
+		cid, err := c.App.Ipfs.Add(cache)
 
 		c.App.Logger.Error(err)
 
@@ -60,6 +58,9 @@ func Add(c *context.Request) {
 		// todo：上传matedata数据
 		request.UploadFile(c, md)
 		c.App.Logger.Log("上传成功,CID: ", md.CID)
+
+		os.Remove(cache.Name())
+
 		elapsed := time.Since(start)
 		fmt.Println("该命令执行完成耗时：", elapsed)
 		return

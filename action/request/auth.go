@@ -21,6 +21,7 @@ func VerifyMD5(c *context.Request, md5 string) map[string]interface{} {
 	Url.RawQuery = params.Encode()
 	resp, err := http.Get(Url.String())
 
+	c.App.Logger.Error(err)
 	c.App.Logger.Log(Url.String())
 
 	defer resp.Body.Close()

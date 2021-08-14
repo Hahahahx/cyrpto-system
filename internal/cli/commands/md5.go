@@ -7,11 +7,11 @@ import (
 	"github.com/urfave/cli/v2" // imports as package "cli"
 )
 
-func Decrypt() *cli.Command {
+func MD5() *cli.Command {
 	return &cli.Command{
-		Name: "decrypt",
+		Name: "md5",
 		// Aliases: []string{"a"},
-		Usage: "decrypt file",
+		Usage: "md5sum file",
 		Action: func(c *cli.Context) error {
 			context.Load()
 
@@ -19,7 +19,7 @@ func Decrypt() *cli.Command {
 				context.App.Logger.Error(errors.New("error Args"))
 			}
 
-			action.Decrypt(&context.Request{
+			action.MD5(&context.Request{
 				App: context.App,
 				Cli: c,
 			})
@@ -27,17 +27,11 @@ func Decrypt() *cli.Command {
 			return nil
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "name",
-				Required: true,
-				Aliases:  []string{"n"},
-				Usage:    "encrypt name `string`",
-			},
-			&cli.StringFlag{
-				Name:     "key",
-				Required: true,
-				Aliases:  []string{"k"},
-				Usage:    "crypt key `string`",
+			&cli.BoolFlag{
+				Name:    "verify",
+				Value:   false,
+				Aliases: []string{"v"},
+				Usage:   "verify file from MDMS `bool`",
 			},
 		},
 	}
