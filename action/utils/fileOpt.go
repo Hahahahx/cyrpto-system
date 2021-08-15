@@ -17,8 +17,10 @@ func FileAbsPath(file *os.File) string {
 	absPath, err := filepath.Abs(filepath.Dir(file.Name()))
 	context.App.Logger.Error(err)
 
-	// 有时候文件名file.Name()本身就是一个绝对路径..
-	// 避免出现奇怪的问题加一层Base
+	// 有时候文件名file.Name()本身是一个相对于当前执行文件的路径
+	// 所以如果文件不是在当前目录下那么就会出现其他的路径
+	// 除非直接使用file.Stat()中的Name()
+	// 否则避免出现奇怪的问题需要加一层Base
 	return filepath.Join(absPath, filepath.Base(file.Name()))
 }
 

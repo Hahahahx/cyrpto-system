@@ -1,5 +1,0 @@
-[36;44m[30m INFO [0m[0m  2021/08/15 15:15:22 main.go加密完成 √
-[36;44m[30m INFO [0m[0m  2021/08/15 15:15:22 保存好您的文件密钥，它将是唯一能解开该文件的重要凭借:
-	 tpKZNWBmQftjXffOSBFbqqHkw5c2yoViDDf47Cn3WmvMyd0+pAnN1cWz6+Lsb+FKBmKVxeQhjsqKvL9cYUqvJwuFvgwMyQKYBGuG9IkPB82FYirR82lCfJ5F6QOgYr0A5LuqE6kE8H8UWaoiNOwchYDLbKYIVIYngPghwGggvVkKcPAG7OUkktnWfEXlOaE6Z8owjA3jdWlFxFnKE5IhSi8pcqgqYHfJ6Urse8clY3UEeKE3ai6GoOZOfa47D7tGIL1nsdR3/WOtaNdXVuSHjUlLbpflxQ7NL2h2KfUFffxG6PhaGK+SPrUTqh1YBEnp2IlCXT02oZFH+leJ5R4ROg==
-[36;44m[30m INFO [0m[0m  2021/08/15 15:16:34 fileSize :  114
-[36;41m[30m ERROR [0m[0m 2021/08/15 15:16:34 open E:\workspace\go\ipfs-crypto\.crypto-system\files\.crypto-system\files\main.go.encrypt.decrypt: The system cannot find the path specified. 

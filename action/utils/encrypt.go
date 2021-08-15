@@ -32,7 +32,7 @@ func EncryptFileCache(file *os.File) (*os.File, string) {
 	start := time.Now() // 获取当前时间
 
 	// 创建一个临时缓存的文件
-	cacheFile, err := os.OpenFile(filepath.Join(context.App.Config.Path.Cache(), file.Name()+".cache"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
+	cacheFile, err := os.OpenFile(filepath.Join(context.App.Config.Path.Cache(), filepath.Base(file.Name())+".cache"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
 	context.App.Logger.Error(err)
 	// defer cacheFile.Close()
 
