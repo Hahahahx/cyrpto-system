@@ -1,38 +1,35 @@
 package action
 
 import (
+	"crypto-system/action/utils"
 	"crypto-system/internal/context"
-	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
-func Decrypt(c *context.Request) {
+func Decrypt(opts *DecryptOptions) {
 
-	filename := c.Cli.Args().First()
-
-	fileKey, err := ioutil.ReadFile(c.Cli.String("k"))
-	c.App.Logger.Error(err)
-
-	file, err := os.Open(filename)
-	c.App.Logger.Error(err)
+	var downloadFile string
+	file, err := os.Open(opts.Filename)
+	context.App.Logger.Error(err)
 
 	fileInfo, err := file.Stat()
-	if err != nil {
-		c.App.Logger.Error(err)
+	context.App.Logger.Error(err)
+	context.App.Logger.Log("fileSize : ", fileInfo.Size())
+
+	key := utils.DecryptByLocalKey(string(opts.Key))
+
+	// 查看是否指定了文件
+	// 否则下载到files目录下
+	// 并且命名为CID
+	if opts.Newname != "" {
+		downloadFile = opts.Newname
+	} else {
+		downloadFile = filepath.Join(context.App.Config.Path.Download(), filepath.Base(file.Name())+".decrypt")
 	}
 
-	fmt.Println("fileSize : ", fileInfo.Size())
+	utils.DecryptFileCache(file, downloadFile, key)
 
-	// buf := make([]byte, 50)
-	// file.Read(buf)
+	context.App.Logger.Log(fileInfo.Name() + "解密完成 √")
 
-	key := localDecryptKey(c, string(fileKey))
-
-	decryptFileCache(c, file, filename, key)
-
-	// decryptData := decryptFile(c, buf, key)
-	c.App.Logger.Log(fileInfo.Name() + "解密完成 √")
-
-	// download(c, decryptData, c.Cli.String("n"))
 }

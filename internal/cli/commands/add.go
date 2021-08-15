@@ -4,13 +4,13 @@ import (
 	"crypto-system/action"
 	"crypto-system/internal/context"
 	"errors"
-	"github.com/urfave/cli/v2" // imports as package "cli"
+
+	"github.com/urfave/cli/v2"
 )
 
 func Add() *cli.Command {
 	return &cli.Command{
-		Name: "add",
-		// Aliases: []string{"a"},
+		Name:  "add",
 		Usage: "add a task to the list",
 		Action: func(c *cli.Context) error {
 			context.Load()
@@ -19,9 +19,9 @@ func Add() *cli.Command {
 				context.App.Logger.Error(errors.New("error Args"))
 			}
 
-			action.Add(&context.Request{
-				App: context.App,
-				Cli: c,
+			action.Add(&action.AddOptions{
+				Filename: c.Args().First(),
+				Encrypt:  c.Bool("e"),
 			})
 
 			return nil

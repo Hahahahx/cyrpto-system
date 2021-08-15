@@ -2,7 +2,6 @@ package context
 
 import (
 	"crypto-system/internal/crypto"
-	"fmt"
 	"log"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -46,14 +45,14 @@ func Load() {
 	App.Crypto = crypto
 	App.Ipfs = shell.NewShell(App.Config.Ipfs.Api())
 
-	res, err := App.Ipfs.ID()
+	// res, err := App.Ipfs.ID()
 
-	if err != nil {
-		log.Println("connect ipfs is error")
-		return
-	} else {
-		fmt.Println("connected ipfs ", res.ID)
-	}
+	// if err != nil {
+	// 	log.Println("connect ipfs is error")
+	// 	return
+	// } else {
+	// 	fmt.Println("connected ipfs ", res.ID)
+	// }
 
 	// App.Logger.Log("ipfs id : " + res.ID)
 

@@ -4,13 +4,13 @@ import (
 	"crypto-system/action"
 	"crypto-system/internal/context"
 	"errors"
-	"github.com/urfave/cli/v2" // imports as package "cli"
+
+	"github.com/urfave/cli/v2"
 )
 
 func Get() *cli.Command {
 	return &cli.Command{
-		Name: "get",
-		// Aliases: []string{"a"},
+		Name:  "get",
 		Usage: "get file",
 		Action: func(c *cli.Context) error {
 			context.Load()
@@ -19,19 +19,19 @@ func Get() *cli.Command {
 				context.App.Logger.Error(errors.New("error Args"))
 			}
 
-			action.Get(&context.Request{
-				App: context.App,
-				Cli: c,
+			action.Get(&action.GetOptions{
+				CID:     c.Args().First(),
+				Decrypt: c.Bool("d"),
+				Newname: c.String("n"),
 			})
 
 			return nil
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "name",
-				Required: true,
-				Aliases:  []string{"n"},
-				Usage:    "file name <file.key> `string`",
+				Name:    "name",
+				Aliases: []string{"n"},
+				Usage:   "file name <file.key> `string`",
 			},
 			&cli.BoolFlag{
 				Name:    "decrypt",

@@ -1,43 +1,47 @@
 package action
 
 import (
+	"crypto-system/action/utils"
 	"crypto-system/internal/context"
 	"crypto-system/internal/crypto"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"path/filepath"
 	"time"
 )
 
-func Get(c *context.Request) {
+func Get(opts *GetOptions) {
+
+	var (
+		cacheFilePath, key string
+	)
 
 	start := time.Now() // 获取当前时间
-	cid := c.Cli.Args().First()
+	url := context.App.Config.Ipfs.GetFileURL(opts.CID)
 
-	url := c.App.Config.Ipfs.GetFileURL(cid)
-
-	resp, err := http.Get(url)
-
-	c.App.Logger.Error(err, "get url error")
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	c.App.Logger.Error(err, "read data error")
-
-	isEncrypt := c.Cli.Bool("d")
-
-	if isEncrypt {
-
-		key := remoteDecryptKey(c, cid)
-
-		ases := time.Now() // 获取当前时间
-		data = crypto.AesCTR_Decrypt(data, key)
-		elapsed := time.Since(ases)
-		fmt.Println("文件AES解密完成耗时：", elapsed)
+	progress := func(length, downlen int64) {
 
 	}
 
-	download(c, data, c.Cli.String("n"))
+	// 查看是否指定了文件
+	// 否则下载到files目录下
+	// 并且命名为CID
+	if opts.Newname != "" {
+		cacheFilePath = opts.Newname
+	} else {
+		cacheFilePath = filepath.Join(context.App.Config.Path.Download(), opts.CID)
+	}
+
+	if opts.Decrypt {
+		key = utils.DecryptByRemoteKey(opts.CID)
+		utils.FileDownload(url, cacheFilePath, func(buf []byte) []byte {
+			return crypto.AesCTR_Decrypt(buf, key)
+		}, progress)
+	} else {
+		utils.FileDownload(url, cacheFilePath, func(buf []byte) []byte {
+			return buf
+		}, progress)
+	}
+
 	elapsed := time.Since(start)
 	fmt.Println("该命令执行完成耗时：", elapsed)
 

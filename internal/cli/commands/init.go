@@ -16,22 +16,25 @@ func Init() *cli.Command {
 		Usage: "initialize crypto-system configure file",
 		Action: func(c *cli.Context) error {
 
-			path := c.String("p")
+			// 查看是否有配置环境变量
+			// 没有的话则设置在当前目录下构建配置文件夹
+			path := os.Getenv("CRYPT_SYSTEM_CONFIG_PATH")
 			if path == "" {
 				abs, _ := filepath.Abs(".")
 				path = abs
 			}
 			if AddConfigPathAndSetEnv(path) != nil {
-
 				log.Fatalln("set configure path to \"" + path + "\" is error ")
 				return nil
 			}
 
+			// 创建config.yaml
 			if context.GenerateConfig() != nil {
 				log.Fatalln("generate configure file is error")
 				return nil
 			}
 
+			// 创建密钥
 			_, err := context.GenerateKey()
 			if err != nil {
 				log.Fatalln("load crypto is error")
@@ -40,16 +43,10 @@ func Init() *cli.Command {
 
 			return nil
 		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "path",
-				Aliases: []string{"p"},
-				Usage:   "set configure file path `string`",
-			},
-		},
 	}
 }
 
+// 设置并生成配置文件夹，并添加到环境变量中
 func AddConfigPathAndSetEnv(path string) error {
 
 	base := filepath.Base(path)

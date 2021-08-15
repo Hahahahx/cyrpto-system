@@ -1,6 +1,7 @@
 package action
 
 import (
+	"crypto-system/action/utils"
 	"crypto-system/internal/context"
 	"fmt"
 	"os"
@@ -8,44 +9,37 @@ import (
 	"time"
 )
 
-func Encrypt(c *context.Request) {
+func Encrypt(opts *EncryptOptions) {
 
 	start := time.Now() // 获取当前时间
-	filename := c.Cli.Args().First()
 
-	file, err := os.Open(filename)
-	c.App.Logger.Error(err)
+	file, err := os.Open(opts.Filename)
+	context.App.Logger.Error(err)
 
 	fileInfo, err := file.Stat()
-	if err != nil {
-		c.App.Logger.Error(err)
-	}
-	// buf := make([]byte, fileInfo.Size())
+	context.App.Logger.Error(err)
 
-	// file.Read(buf)
-
-	cache, key := encryptFileCache(c, file)
+	cache, key := utils.EncryptFileCache(file)
+	// 此处直接Close就行了
+	// 不然下面移动文件的时候会发生
+	// 文件尚未关闭的错误
+	// 导致无法移动
 	cache.Close()
 
-	// encryptData, key := encryptFile(c, buf)
+	key = utils.EncryptByLocalKey(key)
 
-	key = localEncryptKey(c, key)
-	c.App.Logger.Log(fileInfo.Name() + "加密完成 √")
+	context.App.Logger.Log(fileInfo.Name() + "加密完成 √")
+	context.App.Logger.Log("保存好您的文件密钥，它将是唯一能解开该文件的重要凭借:\n\t", key)
 
-	c.App.Logger.Log("保存好您的文件密钥，它将是唯一能解开该文件的重要凭借:\n\t", key)
+	// 保存密钥文件
+	utils.FileSave([]byte(key), opts.Filename+".key")
 
-	download(c, []byte(key), c.Cli.String("n")+".key")
-	// download(c, encryptData, c.Cli.String("n"))
+	// 将缓存中的加密数据拷贝到files文件夹中
+	downloadFile := filepath.Join(context.App.Config.Path.Download(), filepath.Base(file.Name())+".encrypt")
+	err = os.Rename(utils.FileAbsPath(cache), downloadFile)
 
-	downloadFile := filepath.Join(c.App.Config.Path.Download(), file.Name())
+	context.App.Logger.Error(err, "remove file is err")
 
-	if filename = c.Cli.String("n"); filename != "" {
-		downloadFile = filepath.Join(c.App.Config.Path.Download(), filename)
-	}
-
-	fmt.Println(GetAbsPath(c, cache), "\t======>\t", downloadFile)
-
-	os.Rename(GetAbsPath(c, cache), downloadFile)
 	elapsed := time.Since(start)
 	fmt.Println("该命令执行完成耗时：", elapsed)
 

@@ -4,13 +4,13 @@ import (
 	"crypto-system/action"
 	"crypto-system/internal/context"
 	"errors"
-	"github.com/urfave/cli/v2" // imports as package "cli"
+
+	"github.com/urfave/cli/v2"
 )
 
 func MD5() *cli.Command {
 	return &cli.Command{
-		Name: "md5",
-		// Aliases: []string{"a"},
+		Name:  "md5",
 		Usage: "md5sum file",
 		Action: func(c *cli.Context) error {
 			context.Load()
@@ -19,9 +19,9 @@ func MD5() *cli.Command {
 				context.App.Logger.Error(errors.New("error Args"))
 			}
 
-			action.MD5(&context.Request{
-				App: context.App,
-				Cli: c,
+			action.MD5(&action.MD5Options{
+				Filename: c.Args().First(),
+				Verify:   c.Bool("v"),
 			})
 
 			return nil

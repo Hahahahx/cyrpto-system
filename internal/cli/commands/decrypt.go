@@ -4,13 +4,14 @@ import (
 	"crypto-system/action"
 	"crypto-system/internal/context"
 	"errors"
-	"github.com/urfave/cli/v2" // imports as package "cli"
+	"io/ioutil"
+
+	"github.com/urfave/cli/v2"
 )
 
 func Decrypt() *cli.Command {
 	return &cli.Command{
-		Name: "decrypt",
-		// Aliases: []string{"a"},
+		Name:  "decrypt",
 		Usage: "decrypt file",
 		Action: func(c *cli.Context) error {
 			context.Load()
@@ -19,19 +20,22 @@ func Decrypt() *cli.Command {
 				context.App.Logger.Error(errors.New("error Args"))
 			}
 
-			action.Decrypt(&context.Request{
-				App: context.App,
-				Cli: c,
+			fileKey, err := ioutil.ReadFile(c.String("k"))
+			context.App.Logger.Error(err, "load key error")
+
+			action.Decrypt(&action.DecryptOptions{
+				Filename: c.Args().First(),
+				Key:      fileKey,
+				Newname:  c.String("n"),
 			})
 
 			return nil
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "name",
-				Required: true,
-				Aliases:  []string{"n"},
-				Usage:    "encrypt name `string`",
+				Name:    "name",
+				Aliases: []string{"n"},
+				Usage:   "encrypt name `string`",
 			},
 			&cli.StringFlag{
 				Name:     "key",

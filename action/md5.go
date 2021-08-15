@@ -1,40 +1,39 @@
 package action
 
 import (
+	"crypto-system/action/utils"
 	"crypto-system/internal/context"
 	"fmt"
 	"os"
 	"time"
 )
 
-func MD5(c *context.Request) {
+type MD5Options struct {
+	Filename string
+	Verify   bool
+}
+
+func MD5(opts *MD5Options) {
 
 	start := time.Now() // 获取当前时间
-	filename := c.Cli.Args().First()
-
-	isVerify := c.Cli.Bool("v")
-	file, err := os.Open(filename)
-	c.App.Logger.Error(err)
+	file, err := os.Open(opts.Filename)
+	context.App.Logger.Error(err)
 	defer file.Close()
 
-	absPath := GetAbsPath(c, file)
+	absPath := utils.FileAbsPath(file)
 
-	if isVerify {
-
-		res, frigerPrint := verifyMD5(c, file)
-		c.App.Logger.Log(absPath, ":", frigerPrint)
-
+	if opts.Verify {
+		res, md5 := utils.VerifyMD5(file)
+		context.App.Logger.Log(absPath, ":", md5)
 		if res["hasFile"].(bool) {
-			c.App.Logger.Log("文件已经存在,CID: ", res["CID"])
+			context.App.Logger.Log("文件已经存在,CID: ", res["CID"])
 		}
 
-		elapsed := time.Since(start)
-		fmt.Println("该命令执行完成耗时：", elapsed)
-		return
-
+	} else {
+		md5 := utils.MD5sum(file)
+		context.App.Logger.Log(absPath, ":", md5)
 	}
-	frigerPrint := md5sum(c, file)
-	c.App.Logger.Log(absPath, ":", frigerPrint)
+
 	elapsed := time.Since(start)
 	fmt.Println("该命令执行完成耗时：", elapsed)
 }
