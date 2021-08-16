@@ -17,7 +17,7 @@ func EncryptFile(file []byte) ([]byte, string) {
 	aesKey := crypto.GetRandomString(32)
 
 	start := time.Now() // 获取当前时间
-	encryptData := crypto.AesCTR_Encrypt(file, aesKey)
+	encryptData := crypto.AesCTR_crypter(file, aesKey)
 	elapsed := time.Since(start)
 	fmt.Println("文件加密完成耗时：", elapsed)
 
@@ -36,10 +36,10 @@ func EncryptFileCache(file *os.File) (*os.File, string) {
 	context.App.Logger.Error(err)
 	// defer cacheFile.Close()
 
-	aesKey := crypto.GetRandomString(32)
+	aesKey := crypto.GetRandomString(16)
 
 	FileForEach(file, func(buf []byte) {
-		encryptData := crypto.AesCTR_Encrypt(buf, aesKey)
+		encryptData := crypto.AesCTR_crypter(buf, aesKey)
 		_, err = cacheFile.Write(encryptData)
 		context.App.Logger.Error(err)
 	})
@@ -63,7 +63,7 @@ func EncryptByLocalKey(key string) string {
 // 加密文件密钥,通过KMS的公钥
 func EncryptByRemoteKey(key string) string {
 
-	// todo：http获取KMS公钥
+	// http获取KMS公钥
 	res := request.GetKMSKey()
 
 	start := time.Now() // 获取当前时间

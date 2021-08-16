@@ -33,11 +33,11 @@ func Get(opts *GetOptions) {
 
 	if opts.Decrypt {
 		key = utils.DecryptByRemoteKey(opts.CID)
-		utils.FileDownload(url, cacheFilePath, func(buf []byte) []byte {
-			return crypto.AesCTR_Decrypt(buf, key)
+		utils.FileDownload(url, cacheFilePath, func(buf []byte, len int64) []byte {
+			return crypto.AesCTR_crypter(buf, key)
 		}, progress)
 	} else {
-		utils.FileDownload(url, cacheFilePath, func(buf []byte) []byte {
+		utils.FileDownload(url, cacheFilePath, func(buf []byte, len int64) []byte {
 			return buf
 		}, progress)
 	}

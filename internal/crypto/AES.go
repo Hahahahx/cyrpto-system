@@ -30,7 +30,8 @@ func GetRandomString(l int) string {
 	return string(result)
 }
 
-func AesCTR_Encrypt(orig []byte, key string) []byte {
+// AesCTR 加解密使用的是同一个流程
+func AesCTR_crypter(orig []byte, key string) []byte {
 	k := []byte("wumansgygoaescbc")
 
 	block, _ := aes.NewCipher(k)
@@ -39,17 +40,6 @@ func AesCTR_Encrypt(orig []byte, key string) []byte {
 	cipherText := make([]byte, len(orig))
 	stream.XORKeyStream(cipherText, orig)
 	return cipherText
-}
-
-func AesCTR_Decrypt(cryted []byte, key string) []byte {
-	k := []byte("wumansgygoaescbc")
-
-	block, _ := aes.NewCipher(k)
-	stream := cipher.NewCTR(block, k)
-
-	plainText := make([]byte, len(cryted))
-	stream.XORKeyStream(plainText, cryted)
-	return plainText
 }
 
 func AesCBC_Encrypt(orig []byte, key string) []byte {

@@ -48,7 +48,7 @@ func FileForEach(file *os.File, fn func(buf []byte)) {
 }
 
 // 文件下载工具
-func FileDownload(url, filename string, decrypt func(buf []byte) []byte, progressBar func(length, downlen int64)) {
+func FileDownload(url, filename string, decrypt func(buf []byte, length int64) []byte, progressBar func(length, downlen int64)) {
 	var (
 		written, fsize int64
 		buf            = make([]byte, context.App.Config.File.Chunk)
@@ -93,7 +93,7 @@ func FileDownload(url, filename string, decrypt func(buf []byte) []byte, progres
 			// 即是否是加密文件
 			// 如果不是加密文件直接返回buf即可
 			// 如果是加密文件则在回调中完成解密
-			nw, ew := file.Write(decrypt(buf[0:nr]))
+			nw, ew := file.Write(decrypt(buf[0:nr], int64(nr)))
 			// 数据长度大于0
 			if nw > 0 {
 				written += int64(nw)
@@ -124,12 +124,13 @@ func FileDownload(url, filename string, decrypt func(buf []byte) []byte, progres
 // 如果是半成品就会直接删除，当作没有文件
 func FileIsExist(filename string, filesize int64) bool {
 	info, err := os.Stat(filename)
+
 	if os.IsNotExist(err) {
-		context.App.Logger.Error(err)
+		return false
 	}
 
 	if filesize == info.Size() {
-		context.App.Logger.Info("file is download already")
+		context.App.Logger.Info("file " + filename + " is download already")
 		return true
 	}
 

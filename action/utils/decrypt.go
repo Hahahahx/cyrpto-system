@@ -14,7 +14,7 @@ import (
 func DecryptFile(file []byte, key string) []byte {
 
 	start := time.Now() // 获取当前时间
-	res := crypto.AesCTR_Encrypt(file, key)
+	res := crypto.AesCTR_crypter(file, key)
 	elapsed := time.Since(start)
 	fmt.Println("文件解密完成耗时：", elapsed)
 
@@ -31,7 +31,7 @@ func DecryptFileCache(file *os.File, filename, key string) {
 
 	// 读取流同时解密并写入到新的文件中
 	FileForEach(file, func(buf []byte) {
-		encryptData := crypto.AesCTR_Decrypt(buf, key)
+		encryptData := crypto.AesCTR_crypter(buf, key)
 		_, err = daownloadFile.Write(encryptData)
 		context.App.Logger.Error(err)
 	})
