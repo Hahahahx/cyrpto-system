@@ -13,7 +13,7 @@ func Init() *cli.Command {
 	return &cli.Command{
 		Name: "init",
 		// Aliases: []string{"a"},
-		Usage: "initialize crypto-system configure file",
+		Usage: "initialize configure file",
 		Action: func(c *cli.Context) error {
 
 			// 查看是否有配置环境变量

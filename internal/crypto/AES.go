@@ -34,6 +34,8 @@ func GetRandomString(l int) string {
 func AesCTR_crypter(orig []byte, key string) []byte {
 	k := []byte("wumansgygoaescbc")
 
+	fmt.Println(string(k))
+
 	block, _ := aes.NewCipher(k)
 	stream := cipher.NewCTR(block, k)
 

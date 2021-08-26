@@ -12,7 +12,7 @@ import (
 func Decrypt() *cli.Command {
 	return &cli.Command{
 		Name:  "decrypt",
-		Usage: "decrypt file",
+		Usage: "decrypt file on local",
 		Action: func(c *cli.Context) error {
 			context.Load()
 

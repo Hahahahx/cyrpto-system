@@ -11,7 +11,7 @@ import (
 func MD5() *cli.Command {
 	return &cli.Command{
 		Name:  "md5",
-		Usage: "md5sum file",
+		Usage: "md5 file",
 		Action: func(c *cli.Context) error {
 			context.Load()
 

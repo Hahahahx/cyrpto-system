@@ -30,6 +30,7 @@ func init() {
 			commands.MD5(),
 			commands.Encrypt(),
 			commands.Decrypt(),
+			commands.List(),
 			commands.Init(),
 		},
 	}

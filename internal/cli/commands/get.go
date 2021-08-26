@@ -11,7 +11,7 @@ import (
 func Get() *cli.Command {
 	return &cli.Command{
 		Name:  "get",
-		Usage: "get file",
+		Usage: "get file from ipfs",
 		Action: func(c *cli.Context) error {
 			context.Load()
 

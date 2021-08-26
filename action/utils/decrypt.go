@@ -37,7 +37,7 @@ func DecryptFileCache(file *os.File, filename, key string) {
 	})
 
 	elapsed := time.Since(start)
-	fmt.Println("文件加密完成耗时：", elapsed)
+	fmt.Println("文件解密完成耗时：", elapsed)
 }
 
 // 解密文件密钥,通过本地的私钥

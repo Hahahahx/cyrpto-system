@@ -11,7 +11,7 @@ import (
 func Add() *cli.Command {
 	return &cli.Command{
 		Name:  "add",
-		Usage: "add a task to the list",
+		Usage: "add file to ipfs",
 		Action: func(c *cli.Context) error {
 			context.Load()
 

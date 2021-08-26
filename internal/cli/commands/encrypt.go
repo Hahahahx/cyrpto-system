@@ -11,7 +11,7 @@ import (
 func Encrypt() *cli.Command {
 	return &cli.Command{
 		Name:  "encrypt",
-		Usage: "encrypt file",
+		Usage: "encrypt file on local",
 		Action: func(c *cli.Context) error {
 			context.Load()
 

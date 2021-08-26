@@ -48,11 +48,7 @@ func FileForEach(file *os.File, fn func(buf []byte)) {
 }
 
 // 文件下载工具
-func FileDownload(url, filename string, decrypt func(buf []byte, length int64) []byte, progressBar func(length, downlen int64)) {
-	var (
-		written, fsize int64
-		buf            = make([]byte, context.App.Config.File.Chunk)
-	)
+func FileDownload(url, filename string, decrypt func(buf []byte, length int64) []byte, progressBar func(length, downlen int64)) *os.File {
 
 	client := new(http.Client)
 	// client.Timeout=time.Second * 60 // 设置超时时间
@@ -61,19 +57,19 @@ func FileDownload(url, filename string, decrypt func(buf []byte, length int64) [
 
 	context.App.Logger.Error(err)
 
-	fsize, err = strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 32)
+	fsize, err := strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 32)
 
 	context.App.Logger.Error(err)
 
 	if FileIsExist(filename, fsize) {
-		return
+		return nil
 	}
 
 	file, err := os.Create(filename)
 
 	context.App.Logger.Error(err)
 
-	defer file.Close()
+	// defer file.Close()
 
 	if resp.Body == nil {
 		context.App.Logger.Error(errors.New("request body is null"))
@@ -81,21 +77,31 @@ func FileDownload(url, filename string, decrypt func(buf []byte, length int64) [
 
 	defer resp.Body.Close()
 
+	var (
+		written int64
+		buf     = make([]byte, context.App.Config.File.Chunk)
+	)
 	// 下列流程其实可以直接使用io.copyBuffer()
 	// 但是我们下载的时候需要对文件进行解密
 	// 使用流加密，直接流解密即可，读多少解密多少写多少
 	for {
 		// 每次下载
 		nr, er := resp.Body.Read(buf)
+
 		if nr > 0 {
 			// 下载多少解密多少写入多少
 			// 解密使用回调函数留给外部决定是否解密
 			// 即是否是加密文件
 			// 如果不是加密文件直接返回buf即可
 			// 如果是加密文件则在回调中完成解密
+			// issue：这个目前有点bug
+			// 因为解密必须根据加密的chunk大小
+			// 但是下载的buf是不稳定的，所以暂时建议是先下载文件
+			// 然后对下载的文件再次解密
 			nw, ew := file.Write(decrypt(buf[0:nr], int64(nr)))
+			// nw, ew := file.Write(buf[0:nr])
 			// 数据长度大于0
-			if nw > 0 {
+			if nw >= 0 {
 				written += int64(nw)
 			}
 			// 写入出错
@@ -103,20 +109,28 @@ func FileDownload(url, filename string, decrypt func(buf []byte, length int64) [
 				err = ew
 				break
 			}
+			//读取是数据长度不等于写入的数据长度
+			if nr != nw {
+				err = io.ErrShortWrite
+				break
+			}
 		}
 		// 读取下载的数据时，数据长度不等于写入的数据长度
+
 		if er != nil {
 			// 空数据
 			if er != io.EOF {
 				err = er
 			}
+			progressBar(fsize, written)
 			break
 		}
 		// 没有异常，回调进度条
 		progressBar(fsize, written)
 	}
-	file.Close()
+	// file.Close()
 	context.App.Logger.Error(err)
+	return file
 }
 
 // 判断文件是否存在

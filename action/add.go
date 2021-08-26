@@ -33,6 +33,8 @@ func Add(opts *AddOptions) {
 		// 和未经过MD5直接加密的文件就不一致了！
 		// 目前不知道是什么原因导致的，但是重新打开文件应该就没问题了
 		file.Close()
+
+		fmt.Println(res["hasFile"].(bool))
 		if res["hasFile"].(bool) {
 			context.App.Logger.Log("上传成功,CID: ", res["CID"])
 			return
@@ -65,6 +67,7 @@ func Add(opts *AddOptions) {
 
 		md.CID = cid
 
+		fmt.Println(md)
 		// 上传matedata数据
 		request.UploadFile(md)
 		context.App.Logger.Log("上传成功,CID: ", md.CID)

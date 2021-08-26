@@ -18,7 +18,7 @@ type Config struct {
 func GenerateConfig() error {
 	configPath := os.Getenv("CRYPT_SYSTEM_CONFIG_PATH")
 	viper.AddConfigPath(configPath)
-	viper.SetDefault("file.chunk", 1024*1024*5)
+	viper.SetDefault("file.chunk", 524288000) // 500M
 	viper.SetDefault("server.host", "http://192.168.50.219")
 	viper.SetDefault("server.port", 9090)
 	viper.SetDefault("path.config", configPath)

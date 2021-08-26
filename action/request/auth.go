@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"crypto-system/internal/context"
 )
@@ -81,8 +82,10 @@ func UploadFile(md *MateData) bool {
 
 	urlValues := url.Values{}
 	urlValues.Add("CID", md.CID)
-	urlValues.Add("FingerPrint", md.MD5)
 	urlValues.Add("Key", md.Key)
+	urlValues.Add("MD5", md.MD5)
+	urlValues.Add("Name", md.Name)
+	urlValues.Add("Size", strconv.Itoa(int(md.Size)))
 	resp, err := http.PostForm(context.App.Config.Server.URL("auth/upload"), urlValues)
 	context.App.Logger.Error(err)
 	context.App.Logger.Log(context.App.Config.Server.URL("auth/upload"))
@@ -95,4 +98,29 @@ func UploadFile(md *MateData) bool {
 		context.App.Logger.Error(errors.New("http request error"))
 	}
 	return res.Result
+}
+
+func GetList() []MateData {
+
+	Url, err := url.Parse(context.App.Config.Server.URL("auth/list"))
+	context.App.Logger.Error(err)
+	resp, err := http.Get(Url.String())
+	context.App.Logger.Error(err)
+	context.App.Logger.Log(Url.String())
+	defer resp.Body.Close()
+
+	var res Response
+	body, _ := ioutil.ReadAll(resp.Body)
+	_ = json.Unmarshal(body, &res)
+
+	if !res.Result {
+		context.App.Logger.Error(errors.New("http request error"))
+	}
+
+	data, _ := res.Data["list"].(string)
+
+	var files []MateData
+	json.Unmarshal([]byte(data), &files)
+
+	return files
 }
