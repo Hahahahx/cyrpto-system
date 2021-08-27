@@ -1,7 +1,7 @@
 package action
 
 import (
-	"crypto-system/action/utils"
+	"crypto-system/action/handle"
 	"crypto-system/internal/context"
 	"os"
 	"path/filepath"
@@ -17,7 +17,7 @@ func Decrypt(opts *DecryptOptions) {
 	context.App.Logger.Error(err)
 	context.App.Logger.Log("fileSize : ", fileInfo.Size())
 
-	key := utils.DecryptByLocalKey(string(opts.Key))
+	key := handle.DecryptByLocalKey(string(opts.Key))
 
 	// 查看是否指定了文件
 	// 否则下载到files目录下
@@ -28,7 +28,7 @@ func Decrypt(opts *DecryptOptions) {
 		downloadFile = filepath.Join(context.App.Config.Path.Download(), filepath.Base(file.Name())+".decrypt")
 	}
 
-	utils.DecryptFileCache(file, downloadFile, key)
+	handle.DecryptFileCache(file, downloadFile, key)
 
 	context.App.Logger.Log(fileInfo.Name() + "解密完成 √")
 

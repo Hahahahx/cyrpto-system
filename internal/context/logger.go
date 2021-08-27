@@ -1,6 +1,7 @@
 package context
 
 import (
+	"crypto-system/utils"
 	"fmt"
 	"io"
 	"log"
@@ -43,31 +44,26 @@ func (l *Logger) Log(msg ...interface{}) {
 	}
 }
 
-func backGround(cBg color.Attribute, format string, a ...interface{}) string {
-	c := color.New(color.FgCyan).Add(cBg)
-	return c.Sprint(color.BlackString(format, a...))
-}
-
 func (l *Logger) Info(msg ...interface{}) {
 
-	l.Logger.SetPrefix(backGround(color.BgBlue, " INFO ") + "  ")
+	l.Logger.SetPrefix(utils.BackGroundString(color.BgBlue, " INFO ") + "  ")
 	l.Logger.Println(msg...)
 
 }
 
 func (l *Logger) Warn(msg ...interface{}) {
-	l.Logger.SetPrefix(backGround(color.BgYellow, " WARN ") + "  ")
+	l.Logger.SetPrefix(utils.BackGroundString(color.BgYellow, " WARN ") + "  ")
 	l.Logger.Println(msg...)
 }
 
 func (l *Logger) Debug(msg ...interface{}) {
-	l.Logger.SetPrefix(backGround(color.BgGreen, " DEBUG ") + " ")
+	l.Logger.SetPrefix(utils.BackGroundString(color.BgGreen, " DEBUG ") + " ")
 	l.Logger.Println(msg...)
 }
 
 func (l *Logger) Error(err error, msg ...interface{}) {
 	if err != nil {
-		l.Logger.SetPrefix(backGround(color.BgRed, " ERROR ") + " ")
+		l.Logger.SetPrefix(utils.BackGroundString(color.BgRed, " ERROR ") + " ")
 		if App.Config.Log == "debug" {
 			_, file, line, _ := runtime.Caller(1)
 			l.Logger.Println(file+":"+strconv.Itoa(line), err, fmt.Sprint(msg...))

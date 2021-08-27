@@ -1,7 +1,7 @@
 package action
 
 import (
-	"crypto-system/action/utils"
+	"crypto-system/action/handle"
 	"crypto-system/internal/context"
 	"fmt"
 	"os"
@@ -20,17 +20,17 @@ func MD5(opts *MD5Options) {
 	context.App.Logger.Error(err)
 	defer file.Close()
 
-	absPath := utils.FileAbsPath(file)
+	absPath := handle.FileAbsPath(file)
 
 	if opts.Verify {
-		res, md5 := utils.VerifyMD5(file)
+		res, md5 := handle.VerifyMD5(file)
 		context.App.Logger.Log(absPath, ":", md5)
 		if res["hasFile"].(bool) {
 			context.App.Logger.Log("文件已经存在,CID: ", res["CID"])
 		}
 
 	} else {
-		md5 := utils.MD5sum(file)
+		md5 := handle.MD5sum(file)
 		context.App.Logger.Log(absPath, ":", md5)
 	}
 

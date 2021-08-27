@@ -1,4 +1,4 @@
-package utils
+package handle
 
 func IF(condition bool, success, failure interface{}) interface{} {
 	if condition {

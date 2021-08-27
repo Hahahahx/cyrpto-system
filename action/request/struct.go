@@ -14,12 +14,13 @@ type Response struct {
 }
 
 type MateData struct {
-	CID   string
-	Key   string `string:"none"`
-	MD5   string `string:"none"`
-	Name  string
-	Size  int64
-	Ctime time.Time `string:"none"`
+	CID     string
+	Key     string `string:"none"`
+	MD5     string `string:"none"`
+	Name    string
+	Size    int64
+	Encrypt bool      `string:"none"`
+	Ctime   time.Time `string:"none"`
 }
 
 type ResultDecrypt struct {

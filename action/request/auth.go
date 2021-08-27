@@ -85,6 +85,7 @@ func UploadFile(md *MateData) bool {
 	urlValues.Add("Key", md.Key)
 	urlValues.Add("MD5", md.MD5)
 	urlValues.Add("Name", md.Name)
+	urlValues.Add("Encrypt", strconv.FormatBool(md.Encrypt))
 	urlValues.Add("Size", strconv.Itoa(int(md.Size)))
 	resp, err := http.PostForm(context.App.Config.Server.URL("auth/upload"), urlValues)
 	context.App.Logger.Error(err)

@@ -1,7 +1,7 @@
 package action
 
 import (
-	"crypto-system/action/utils"
+	"crypto-system/action/handle"
 	"crypto-system/internal/context"
 	"fmt"
 	"os"
@@ -32,13 +32,13 @@ func Get(opts *GetOptions) {
 	}
 
 	if opts.Decrypt {
-		key = utils.DecryptByRemoteKey(opts.CID)
+		key = handle.DecryptByRemoteKey(opts.CID)
 		// fmt.Println(key)
 		cache := filepath.Join(context.App.Config.Path.Cache(), opts.CID)
 
 		// 由于AES-CTR分块必须加密时候多大，解密的时候就得多大
 		// 所以只能下载文件下来然后再去读取文件解密
-		downloadFile := utils.FileDownload(url, cache, func(buf []byte, len int64) []byte {
+		downloadFile := handle.FileDownload(url, cache, func(buf []byte, len int64) []byte {
 			return buf
 			// return crypto.AesCTR_crypter(buf, key)
 		}, progress)
@@ -49,12 +49,12 @@ func Get(opts *GetOptions) {
 		// 不然下载下来的文件hash会有问题，导致解密失败
 		downloadFile, err := os.Open(downloadFile.Name())
 		context.App.Logger.Error(err)
-		utils.DecryptFileCache(downloadFile, cacheFilePath, key)
+		handle.DecryptFileCache(downloadFile, cacheFilePath, key)
 		downloadFile.Close()
 		os.Remove(downloadFile.Name())
 
 	} else {
-		downloadFile := utils.FileDownload(url, cacheFilePath, func(buf []byte, len int64) []byte {
+		downloadFile := handle.FileDownload(url, cacheFilePath, func(buf []byte, len int64) []byte {
 			return buf
 		}, progress)
 		defer downloadFile.Close()
